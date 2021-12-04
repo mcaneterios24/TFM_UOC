@@ -2,6 +2,7 @@
 ### Manuel Cañete Ríos
 ### 04/12/2021
 ### This script will be used to perform EDA on the curated database
+### Also, we will use PCA for dimensionality reduction
 
 ### Dependencies
 library(dplyr)
@@ -70,7 +71,14 @@ t.test(log10(Mean_intensity) ~ Pattern, intensities_and_area, paired = F, var.eq
 wilcox.test(log10(Area) ~ Pattern, intensities_and_area, paired = F)
 t.test(log10(Area) ~ Pattern, intensities_and_area, paired = F, var.equal = T)
 
-### Perform PCAs of the final dataset
+
+### Perform PCAs of the original dataset (not excluding any pixels)
+
+
+
+
+### Perform PCAs of the final dataset (excluding non-informative pixels)
+### This has allowed us to get 100% variance in a reduced number of dimensions
 
 # We keep the pixels we're interested in
 selected_cols <- colnames(pixel_data)[pixels_to_keep$x]
@@ -100,6 +108,15 @@ pca.df %>%
   facet_wrap(~Var, ncol = 2)
 
 ggsave("PCA_EDA.pdf", plot = last_plot(), width = 300, height = 200, units = "mm")
+
+### We will save the PC data, in order to keep these reduced number of dimensions
+
+# Generate dataframe, combining the principal components and the cell pattern
+pca_data <- as.data.frame(cbind(Pattern = pixel_data$Pattern,
+                  pca.res$x))
+
+# Write the file
+fwrite(pca_data, "pca_data_1024.txt", sep = "\t", row.names = F)
 
 ### We print the system information
 Sys.info()
