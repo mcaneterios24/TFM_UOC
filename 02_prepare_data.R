@@ -1,39 +1,40 @@
 
-### Manuel Cañete Ríos
-### 07/11/2021
-### This script will be used to reduce image resolution and also
-### to remove non-informative pixels
+### Manuel CaÃ±ete RÃ­os
+### 04/12/2021
+### This script will be used to remove non-informative pixels 
 
 ### Dependencies
 library(dplyr)
 library(stringr)
 library(ggplot2)
-library(OpenImageR)
 library(data.table)
+library(OpenImageR)
 
 ### Input directory
-input_dir <- "C:/Users/manue/OneDrive/Escritorio/Master/TFM/Imatges/Input data"
+input_dir <- "path/to/files"
 
-### Source script to import the available_images object
-source('C:/Users/manue/OneDrive/Escritorio/Master/TFM/Analysis/01_curate_database.R')
+### Import the selected images from 01_curate_database.R
+available_images <- read.delim(file.path(input_dir, "Inputs", "available_images.txt")) %>%
+  mutate(Image3 = str_replace(Image, "&", "_"))
 
-### Rescale images and append pattern information
-rescaled_data <- sapply(available_images$Image, function(x){
+### Get pixel values for each image in the available_images object and append to this dataframe the pattern information
+pixel_data <- sapply(available_images$Image3, function(x){
   filename <- str_replace(x, ".tiff", ".txt")
-  vect <- scan(file.path(input_dir, "Pixels", filename), quiet = T)
-  mat <- matrix(vect, nrow = 1024)
-  resized <- resizeImage(mat, width = 1024, height = 1024, method = "nearest") # We had to scale due to memory problems with the PCA
-  as.vector(resized)
+  pixels <- as.matrix(fread(file.path(input_dir, "Pixels", filename), header = FALSE))
+  c(pixels)
 }) %>%
   t() %>%
   as.data.frame() %>%
   mutate(Pattern = available_images$Pattern) %>%
   select(Pattern, everything())
 
-### Save rescaled data
-fwrite(rescaled_data, "rescaled_images_400.txt", sep = "\t", row.names = F)
+### Save this dataframe into a .txt as it takes long to produce this object (1024x1024 pixels)
+fwrite(pixel_data, "pixel_data_1024.txt", sep = "\t", row.names = F)
 
-### Generate two average images
+### Now we want to select those pixels that will be important for classification
+### To do so, we will generate median images and, from them, select the important pixels
+
+# First we generate the input objects, selecting the cells of each kind
 input_diffuse <- rescaled_data %>%
   filter(Pattern == "Diffuse") %>%
   select(-Pattern)
@@ -42,14 +43,23 @@ input_aggregate <- rescaled_data %>%
   filter(Pattern == "Aggregate") %>%
   select(-Pattern)
 
-rm(rescaled_data)
+# Now we calculate the median of each pixel for all images
+diffuse_average <- matrix(apply(input_diffuse, 2, median), nrow = 1024)
+aggregate_average <- matrix(apply(input_aggregate, 2, median), nrow = 1024)
 
-diffuse_average <- matrix(apply(input_diffuse, 2, median), nrow = 400)
-aggregate_average <- matrix(apply(input_aggregate, 2, median), nrow = 350)
+# Now we save both median images to take them into Fiji ImageJ:
+fwrite(diffuse_average, file.path(input_dir, "diffuse_median_image.txt"), sep = "\t", row.names = F, col.names = F)
+fwrite(aggregate_average, file.path(input_dir, "aggregate_median_image.txt"), sep = "\t", row.names = F, col.names = F)
 
+# If we want to display them in R:
 imageShow(diffuse_average)
 imageShow(aggregate_average)
 
-### Select which pixels to keep
+# We select which pixels to keep
 pixels_to_keep <- which(aggregate_average > 0.02)
+
+# We write the index of each selected pixel into a file
 write.csv(pixels_to_keep, "pixels_to_keep.csv", row.names = F)
+
+### Finally we print the system information
+Sys.info()
