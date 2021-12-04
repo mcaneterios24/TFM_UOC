@@ -107,7 +107,6 @@ pca.df %>%
   scale_color_manual(values = c("#5B84B1FF", "#FC766AFF")) +
   facet_wrap(~Var, ncol = 2)
 
-ggsave("PCA_EDA.pdf", plot = last_plot(), width = 300, height = 200, units = "mm")
 
 ### We will save the PC data, in order to keep these reduced number of dimensions
 
@@ -117,6 +116,42 @@ pca_data <- as.data.frame(cbind(Pattern = pixel_data$Pattern,
 
 # Write the file
 fwrite(pca_data, "pca_data_1024.txt", sep = "\t", row.names = F)
+
+
+### We generate the plot used in the final report
+
+# PCA plot
+pca_data %>%
+  ggplot(aes(x = PC1, y = PC2, col = Pattern)) +
+  geom_point(show.legend = F, alpha = 0.8) +
+  scale_fill_manual(values = c("#5B84B1FF", "#FC766AFF")) +
+  theme_bw() +
+  theme(text = element_text(size = 12)) +
+  xlab("PC1 (22.6%)") +
+  ylab("PC2 (7.5%%)")
+
+ggsave("pca_vars0.pdf", plot = last_plot(), width = 150, height = 100, units = "mm")
+
+#Scree plots
+scree_data <- data.frame(N = 1:784, Var = sapply(pca_data[2:785], var)) %>%
+  mutate(Proportion = 100*Var/sum(sapply(pca_data[2:785], var)))
+
+scree_data %>%
+  ggplot() +
+  geom_bar(mapping = aes(x = N, y = log10(Var)), stat = "identity", fill = "#AF84B1FF") +
+  theme_bw() +
+  theme(text = element_text(size = 12))
+
+ggsave("pca_vars1.pdf", plot = last_plot(), width = 150, height = 80, units = "mm")
+
+scree_data %>%
+  ggplot() +
+  geom_bar(mapping = aes(x = N, y = cumsum(Proportion)), stat = "identity", fill = "#AF84B1FF") +
+  theme_bw() +
+  theme(text = element_text(size = 12))
+  
+ggsave("pca_vars2.pdf", plot = last_plot(), width = 150, height = 80, units = "mm")
+
 
 ### We print the system information
 Sys.info()
