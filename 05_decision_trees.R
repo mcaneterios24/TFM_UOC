@@ -80,7 +80,7 @@ ggsave("CV_cart.pdf", plot = last_plot(), width = 300, height = 100, units = "mm
 #C5.0
 plot(treeFit2)
 
-c5 %>% # This c5 object has been created in an Excel file using the output of printing treeFit into R console
+c5 %>% # This c5 object has been created in an Excel file using the output of printing treeFit2 into R console
   pivot_longer(-c("trials", "model", "winnow"), names_to = "Metric", values_to = "Value") %>%
   ggplot(mapping = aes(x = trials, y = Value, group = Metric, col = Metric)) +
   geom_point(show.legend = F) +
