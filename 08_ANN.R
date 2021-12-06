@@ -37,7 +37,7 @@ train.y <- to_categorical(matrix(as.numeric(training$Pattern)-1))
 test.x <- as.matrix(sapply(testing[,2:785], scale), nrow = 195)
 test.y <- to_categorical(matrix(as.numeric(testing$Pattern)-1))
 
-### We instantiate the ANN network we will use
+### We instantiate the ANN networks we will use (either using activation = "sigmoid" / "linear" / "relu")
 model <- keras_model_sequential()
 
 model %>%
@@ -58,6 +58,20 @@ history <- fit(model, train.x, train.y,
                validation_data = list(test.x, test.y))
 
 plot(history)
+
+### We plot the history of all three models
+ann %>% # This rbf2 object has been created in an Excel file using the output of printing history$metrics into R console
+  pivot_longer(-c("epoch", "activation"), names_to = "Set", values_to = "AUC") %>%
+  na.omit() %>%
+  ggplot(mapping = aes(x = epoch, y = AUC, group = Set, col = Set)) +
+  geom_point(show.legend = F) +
+  geom_line(show.legend = F) +
+  theme_bw() +
+  theme(text = element_text(size = 12)) +
+  facet_wrap(~activation, scales = "free") +
+  scale_color_manual(values = c("#003049", "#D62828", "#FCBF49"))
+
+ggsave("epochs_ann.pdf", plot = last_plot(), width = 300, height = 100, units = "mm")
 
 ### We use the model to predict classes on the test data
 pred <- predict_classes(model, test.x)
