@@ -46,7 +46,7 @@ model %>%
   layer_dense(units = ncol(train.y), activation = "softmax")
 
 model %>% compile(optimizer = "rmsprop", 
-                  loss = "categorical_crossentropy",  
+                  loss = "binary_crossentropy",  
                   metric=c("AUC"))
 
 print(model)
