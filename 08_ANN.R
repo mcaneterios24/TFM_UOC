@@ -60,7 +60,7 @@ history <- fit(model, train.x, train.y,
 plot(history)
 
 ### We plot the history of all three models
-ann %>% # This rbf2 object has been created in an Excel file using the output of printing history$metrics into R console
+ann %>% # This ann object has been created in an Excel file using the output of printing history$metrics into R console
   pivot_longer(-c("epoch", "activation"), names_to = "Set", values_to = "AUC") %>%
   na.omit() %>%
   ggplot(mapping = aes(x = epoch, y = AUC, group = Set, col = Set)) +
