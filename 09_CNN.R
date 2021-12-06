@@ -95,14 +95,14 @@ train_generator <- flow_images_from_data(
   x = training,
   y = train.y,
   generator = datagen,
-  batch_size = 45 #or 15
+  batch_size = 45 
 )
 
 validation_generator <- flow_images_from_data(
   x = testing,
   y = test.y,
   generator = datagen,
-  batch_size = 45
+  batch_size = 15
 )
 
 ### We instantiate the CNN model
@@ -111,6 +111,8 @@ model %>%
                 input_shape = c(301, 301, 1)) %>% 
   layer_max_pooling_2d(pool_size = c(2,2)) %>% 
   layer_conv_2d(filters = 64, kernel_size = c(3,3), activation = "relu") %>% 
+  layer_max_pooling_2d(pool_size = c(2,2)) %>% 
+  layer_conv_2d(filters = 64, kernel_size = c(3,3), activation = "relu") %>%
   layer_max_pooling_2d(pool_size = c(2,2)) %>% 
   layer_conv_2d(filters = 64, kernel_size = c(3,3), activation = "relu") %>%
   layer_max_pooling_2d(pool_size = c(2,2)) %>% 
@@ -129,10 +131,10 @@ model %>% compile(optimizer = "rmsprop",
 history <- model %>%
   fit_generator(
     generator = train_generator,
-    steps_per_epoch = 10, # or 30
-    epochs = 40,
+    steps_per_epoch = 10, 
+    epochs = 30,
     validation_data = validation_generator,
-    validation_steps = 3
+    validation_steps = 10
   )
 
 ### We use the models to predict classes on the test data
