@@ -95,14 +95,14 @@ train_generator <- flow_images_from_data(
   x = training,
   y = train.y,
   generator = datagen,
-  batch_size = 45
+  batch_size = 45 #or 15
 )
 
 validation_generator <- flow_images_from_data(
   x = testing,
   y = test.y,
   generator = datagen,
-  batch_size = 15
+  batch_size = 45
 )
 
 ### We instantiate the CNN model
@@ -120,11 +120,7 @@ model %>%
   layer_dense(units = 64, activation = "relu") %>% 
   layer_dense(units = ncol(train.y), activation = "softmax")
   
-### We will use both accuracy and AUC as metrics for the training
-model %>% compile(optimizer = "rmsprop", 
-                  loss = "binary_crossentropy",  
-                  metric=c("accuracy"))
-                  
+### We will use AUC as metric for the training                
 model %>% compile(optimizer = "rmsprop", 
                   loss = "binary_crossentropy",  
                   metric=c("AUC"))
@@ -133,10 +129,10 @@ model %>% compile(optimizer = "rmsprop",
 history <- model %>%
   fit_generator(
     generator = train_generator,
-    steps_per_epoch = 10,
+    steps_per_epoch = 10, # or 30
     epochs = 40,
     validation_data = validation_generator,
-    validation_steps = 10
+    validation_steps = 3
   )
 
 ### We use the models to predict classes on the test data
