@@ -71,7 +71,7 @@ SVMFit_radial2
 # SVM linear
 plot(SVMFit_linear)
 
-svmlinear %>% # This svmlinear object has been created in an Excel file using the output of printing RFFit into R console
+svmlinear %>% # This svmlinear object has been created in an Excel file using the output of printing SVMFit_linear into R console
   pivot_longer(-C, names_to = "Metric", values_to = "Value") %>%
   na.omit() %>%
   ggplot(mapping = aes(x = -log(C), y = Value, group = Metric, col = Metric)) +
@@ -87,7 +87,7 @@ ggsave("CV_svmlinear.pdf", plot = last_plot(), width = 300, height = 100, units 
 # SVM radial
 plot(SVMFit_radial)
 
-rbf1 %>% # This rbf1 object has been created in an Excel file using the output of printing RFFit into R console
+rbf1 %>% # This rbf1 object has been created in an Excel file using the output of printing SVM_radial into R console
   pivot_longer(-C, names_to = "Metric", values_to = "Value") %>%
   ggplot(mapping = aes(x = log2(C), y = Value, group = Metric, col = Metric)) +
   geom_point(show.legend = F) +
@@ -102,7 +102,7 @@ ggsave("CV_svmrbf1.pdf", plot = last_plot(), width = 300, height = 100, units = 
 # SVM radial 2
 plot(SVMFit_radial2)
 
-rbf2 %>% # This rbf2 object has been created in an Excel file using the output of printing RFFit into R console
+rbf2 %>% # This rbf2 object has been created in an Excel file using the output of printing SVM_radial2 into R console
   pivot_longer(-c("sigma", "Sigma", "C"), names_to = "Metric", values_to = "Value") %>%
   na.omit() %>%
   ggplot(mapping = aes(x = log2(C), y = Value, group = Sigma, col = Sigma)) +
