@@ -143,5 +143,18 @@ history <- model %>%
 pred <- predict_classes(model, testing)
 confusionMatrix(table(as.vector(pred), as.numeric(available_images$Pattern[-indxTrain])-1))
 
+### Plot the history of the three trainings
+cnn %>% This cnn object has been created in an Excel file using the output of printing history$metrics into R console
+  na.omit() %>%
+  ggplot(mapping = aes(x = epoch, y = value, group = set, col = set)) +
+  geom_point(show.legend = F) +
+  geom_line(show.legend = F) +
+  theme_bw() +
+  theme(text = element_text(size = 12)) +
+  facet_wrap(~trial, scales = "free") +
+  scale_color_manual(values = c("#003049", "#D62828", "#FCBF49"))
+
+ggsave("epochs_cnn.pdf", plot = last_plot(), width = 300, height = 100, units = "mm")
+
 ### We print the system information
 Sys.info()
