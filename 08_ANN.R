@@ -75,7 +75,7 @@ ggsave("epochs_ann.pdf", plot = last_plot(), width = 300, height = 100, units = 
 
 ### We use the model to predict classes on the test data
 pred <- predict_classes(model, test.x)
-confusionMatrix(table(as.vector(pred2), as.numeric(testing$Pattern)-1))
+confusionMatrix(table(as.vector(pred), as.numeric(testing$Pattern)-1))
 
 ### We print the system information
 Sys.info()
